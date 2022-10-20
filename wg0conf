@@ -1,0 +1,62 @@
+[Interface]
+PrivateKey = 2AEw9EDI4kqaEcfXDz4YhSpFcnkxpUa6xtKmHVM92mA=
+Address = 10.0.0.1/32
+ListenPort = 59873
+PostUp = iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o>
+PostDown = iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING >
+
+[Peer]
+PublicKey = vM9eMuTOrXwrjal1qGDWqEBv8LfY8I1v5VSnSXTA93E=
+AllowedIPs = 10.0.0.2/32
+
+[Peer]
+# Nat_iphone
+PublicKey = Kbd/zvKfH20yCtp1NZ8yFv5mXxONhLTBJXRRBM8peQM=
+AllowedIPs = 10.0.0.3/32
+
+[Peer]
+# Lexa_Tili
+PublicKey = SjFvmrs6xDbYAV47ex4UU72QcmL64adcv28lCXIEpSs=
+AllowedIPs = 10.0.0.4/32
+
+
+[Peer]
+#Denis
+PublicKey = dsadada
+AllowedIPs = 10.2.3.4/12
+
+[Peer]
+#Denis
+PublicKey = dsadada
+AllowedIPs = 10.2.3.4/12
+
+[Peer]
+#Denis
+PublicKey = dsadada
+AllowedIPs = 10.2.3.4/12
+
+[Peer]
+#Denis
+PublicKey = dsadada
+AllowedIPs = 10.2.3.4/12
+
+[Peer]
+#Denis
+PublicKey = dsadada
+AllowedIPs = 10.2.3.4/12
+
+[Peer]
+#Denis
+PublicKey = dsadada
+AllowedIPs = 10.2.3.4/12
+
+[Peer]
+#Denis
+PublicKey = dsadada
+AllowedIPs = 10.2.3.4/12
+
+[Peer]
+#Denis
+PublicKey = dsadada
+AllowedIPs = 10.2.3.4/12
+
