@@ -1,8 +1,7 @@
 package com.shumovdenis.wireguardgui.controller;
 
 import com.shumovdenis.wireguardgui.service.UserService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,9 +14,15 @@ public class MainController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
-    public String hello() {
-        return "hi!";
+
+    @PostMapping("/wgshow")
+    public void wgShow() {
+        userService.wgShow();
+    }
+
+    @DeleteMapping("/")
+    public void deleteUser(@RequestParam("username") String username) {
+        userService.deleteUser(username);
     }
 
 
@@ -27,4 +32,6 @@ public class MainController {
     ) {
         userService.addUser(username, allowedIPs);
     }
+
+
 }

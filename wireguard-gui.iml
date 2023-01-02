@@ -23,7 +23,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="jdk" jdkName="corretto-17" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="mysql.connector.java" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-jdbc:2.7.3" level="project" />
@@ -50,11 +50,6 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:5.3.22" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-mustache:2.7.3" level="project" />
     <orderEntry type="library" name="Maven: com.samskivert:jmustache:1.15" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-security:2.7.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.22" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.7.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-web:5.7.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.3.22" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:2.7.3" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-json:2.7.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.13.3" level="project" />
@@ -69,6 +64,8 @@
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:9.0.65" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-web:5.3.22" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:5.3.22" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.22" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.3.22" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.24" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-test:2.7.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-test:2.7.3" level="project" />
@@ -100,8 +97,5 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.3.22" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:5.3.22" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.xmlunit:xmlunit-core:2.9.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.security:spring-security-test:5.7.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.7.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:5.7.3" level="project" />
   </component>
 </module>
