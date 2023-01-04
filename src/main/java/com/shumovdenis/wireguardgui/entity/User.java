@@ -6,12 +6,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class User {
-    String username;
-    String userEmail;
-    String lastHandShake;
-    String privateKey;
-    String publicKey;
-    String allowedIPs;
+    private String username;
+    private String userEmail;
+    private String lastHandShake;
+    private String privateKey;
+    private String publicKey;
+    private String allowedIPs;
 
     public User(String username, String allowedIPs, String privateKey, String publicKey) {
         this.username = username;

@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - include:
+      file: migrations/create_wgusers_table.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: migrations/fill_wgusers_table.sql
+      relativeToChangelogFile: true
