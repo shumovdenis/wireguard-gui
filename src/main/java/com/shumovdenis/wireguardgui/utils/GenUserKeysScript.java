@@ -12,7 +12,6 @@ public class GenUserKeysScript {
             pb.inheritIO();
             Process process = pb.start();
             process.waitFor();
-            //добавить обработку ошибок
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {

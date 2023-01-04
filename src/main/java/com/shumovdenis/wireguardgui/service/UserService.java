@@ -1,6 +1,7 @@
 package com.shumovdenis.wireguardgui.service;
 
 import com.shumovdenis.wireguardgui.entity.User;
+import com.shumovdenis.wireguardgui.repository.UserRepository;
 import com.shumovdenis.wireguardgui.utils.GenUserKeysScript;
 import org.springframework.stereotype.Service;
 
@@ -15,68 +16,22 @@ import java.util.List;
 public class UserService {
     private final String FILE_PATH = "/etc/wireguard/";
 
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public void addUser(String username, String allowedIPs) {
-        GenUserKeysScript genKeys = new GenUserKeysScript();
 
-        try {
-            genKeys.executeCommands(username);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        String privateKey = null;
-        String publicKey = null;
-
-        try {
-            publicKey = readFile(Path.of(FILE_PATH + username + "_publickey")).toString();
-            privateKey = readFile(Path.of(FILE_PATH + username + "_privatekey")).toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        User user = new User(username, allowedIPs, publicKey, privateKey);
-        String peer = addPeerToConf(user.getUsername(), user.getPublicKey(), user.getAllowedIPs());
-        writeFile(peer, FILE_PATH + "wg0.conf");
-    }
-
-    //чтение из консоли
-    public void wgShow() {
-        String s;
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec("systemctl status  wg-quick@wg0");
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(p.getInputStream()));
-            while ((s = br.readLine()) != null)
-                System.out.println("line: " + s);
-            p.waitFor();
-            System.out.println("exit: " + p.exitValue());
-            p.destroy();
-        } catch (Exception e) {
-        }
-    }
-
-    public static String addPeerToConf(String username, String publicKey, String allowedIPs) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[Peer]\n")
-                .append("#" + username + "\n")
-                .append("PublicKey = " + publicKey + "\n")
-                .append("AllowedIPs = " + allowedIPs + "\n\n");
-        return sb.toString();
-    }
-
-    public List<String> readFile(Path path) throws IOException {
-        List<String> list = Files.readAllLines(path);
-        return list;
-    }
-
-    public void writeFile(String peer, String filepath) {
-        try {
-            Files.write(Paths.get(filepath), peer.getBytes(), StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+        User user = addPeerToConf(username, allowedIPs);
+        userRepository.addUser(user);
     }
 
     public void deleteUser(String username) {
+
+        userRepository.deleteUser(username);
+
         try {
 
             File inFile = new File(FILE_PATH + "wg0.conf");
@@ -95,10 +50,11 @@ public class UserService {
 
             while ((line = br.readLine()) != null) {
 
-                if (!line.trim().equals(username)) {
+                if (!line.trim().equals("#" + username)) {
                     pw.println(line);
                     pw.flush();
                 } else {
+                    // change condition
                     while (true) {
                         line = br.readLine();
                         if (line.isEmpty()) break;
@@ -120,6 +76,75 @@ public class UserService {
             ex.printStackTrace();
         }
     }
+
+
+
+
+    //чтение из консоли
+    public void wgShow() {
+        String s;
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec("systemctl status  wg-quick@wg0");
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(p.getInputStream()));
+            while ((s = br.readLine()) != null)
+                System.out.println("line: " + s);
+            p.waitFor();
+            System.out.println("exit: " + p.exitValue());
+            p.destroy();
+        } catch (Exception e) {
+        }
+    }
+
+    public User addPeerToConf (String username, String allowedIPs) {
+        GenUserKeysScript genKeys = new GenUserKeysScript();
+        try {
+            genKeys.executeCommands(username);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String privateKey = null;
+        String publicKey = null;
+
+        try {
+            publicKey = readFile(Path.of(FILE_PATH + username + "_publickey")).toString();
+            privateKey = readFile(Path.of(FILE_PATH + username + "_privatekey")).toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        User user = new User(username, allowedIPs, privateKey, publicKey);
+        String peer = preparationPeerBlock(
+                user.getUsername(), user.getPublicKey(), user.getAllowedIPs()
+        );
+        writeFile(peer, FILE_PATH + "wg0.conf");
+        return user;
+    }
+
+    public String preparationPeerBlock(String username, String publicKey, String allowedIPs) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("#" + username + "\n")
+                .append("[Peer]\n")
+                .append("PublicKey = " + publicKey + "\n")
+                .append("AllowedIPs = " + allowedIPs + "\n\n");
+        return sb.toString();
+    }
+
+    public List<String> readFile(Path path) throws IOException {
+        List<String> list = Files.readAllLines(path);
+        return list;
+    }
+
+    public void writeFile(String peer, String filepath) {
+        try {
+            Files.write(Paths.get(filepath), peer.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+
+
 
 
 }
