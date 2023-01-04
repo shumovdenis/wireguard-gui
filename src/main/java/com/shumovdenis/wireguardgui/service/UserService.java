@@ -29,52 +29,8 @@ public class UserService {
     }
 
     public void deleteUser(String username) {
-
         userRepository.deleteUser(username);
-
-        try {
-
-            File inFile = new File(FILE_PATH + "wg0.conf");
-
-            if (!inFile.isFile()) {
-                System.out.println("Parameter is not an existing file");
-                return;
-            }
-
-            File tempFile = new File(inFile.getAbsolutePath() + ".tmp");
-
-            BufferedReader br = new BufferedReader(new FileReader(FILE_PATH + "wg0.conf"));
-            PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
-
-            String line = null;
-
-            while ((line = br.readLine()) != null) {
-
-                if (!line.trim().equals("#" + username)) {
-                    pw.println(line);
-                    pw.flush();
-                } else {
-                    // change condition
-                    while (true) {
-                        line = br.readLine();
-                        if (line.isEmpty()) break;
-                    }
-                }
-            }
-            pw.close();
-            br.close();
-
-            if (!inFile.delete()) {
-                System.out.println("Could not delete file");
-                return;
-            }
-
-            if (!tempFile.renameTo(inFile))
-                System.out.println("Could not rename file");
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        deleteInfoFromConf(username);
     }
 
 
@@ -120,6 +76,52 @@ public class UserService {
         );
         writeFile(peer, FILE_PATH + "wg0.conf");
         return user;
+    }
+
+    public void deleteInfoFromConf(String username) {
+        try {
+
+            File inFile = new File(FILE_PATH + "wg0.conf");
+
+            if (!inFile.isFile()) {
+                System.out.println("Parameter is not an existing file");
+                return;
+            }
+
+            File tempFile = new File(inFile.getAbsolutePath() + ".tmp");
+
+            BufferedReader br = new BufferedReader(new FileReader(FILE_PATH + "wg0.conf"));
+            PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+
+            String line = null;
+
+            while ((line = br.readLine()) != null) {
+
+                if (!line.trim().equals("#" + username)) {
+                    pw.println(line);
+                    pw.flush();
+                } else {
+                    // change condition
+                    while (true) {
+                        line = br.readLine();
+                        if (line.isEmpty()) break;
+                    }
+                }
+            }
+            pw.close();
+            br.close();
+
+            if (!inFile.delete()) {
+                System.out.println("Could not delete file");
+                return;
+            }
+
+            if (!tempFile.renameTo(inFile))
+                System.out.println("Could not rename file");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public String preparationPeerBlock(String username, String publicKey, String allowedIPs) {
