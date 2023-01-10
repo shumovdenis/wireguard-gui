@@ -2,6 +2,7 @@ package com.shumovdenis.wireguardgui.repository;
 
 import com.shumovdenis.wireguardgui.entity.User;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,6 +27,24 @@ public class UserRepository {
                 user.getPublicKey(),
                 user.getLastHandShake()
         );
+    }
+
+    public User findUser(String username) {
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet("SELECT * FROM wgusers WHERE username = ?", username);
+
+        String allowedIPs = null;
+        String privatekey = null;
+        String publickey = null;
+
+
+        while (sqlRowSet.next()) {
+            allowedIPs = sqlRowSet.getString("allowedIPs");
+            privatekey = sqlRowSet.getString("privatekey");
+            publickey = sqlRowSet.getString("publickey");
+        }
+
+        User user = new User(username, allowedIPs, privatekey, publickey);
+        return user;
     }
 
 

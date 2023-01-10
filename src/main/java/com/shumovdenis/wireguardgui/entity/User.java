@@ -21,4 +21,17 @@ public class User {
         this.publicKey = publicKey;
         this.lastHandShake = "None";
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", userEmail='" + userEmail + '\'' +
+                ", lastHandShake='" + lastHandShake + '\'' +
+                ", privateKey='" + privateKey + '\'' +
+                ", publicKey='" + publicKey + '\'' +
+                ", allowedIPs='" + allowedIPs + '\'' +
+                '}';
+    }
 }

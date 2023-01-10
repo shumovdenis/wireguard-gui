@@ -23,7 +23,6 @@ public class UserService {
     }
 
     public void addUser(String username, String allowedIPs) {
-
         User user = addPeerToConf(username, allowedIPs);
         userRepository.addUser(user);
     }
@@ -31,27 +30,10 @@ public class UserService {
     public void deleteUser(String username) {
         userRepository.deleteUser(username);
         deleteInfoFromConf(username);
+        deleteKeysFiles(username);
     }
 
 
-
-
-    //чтение из консоли
-    public void wgShow() {
-        String s;
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec("systemctl status  wg-quick@wg0");
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(p.getInputStream()));
-            while ((s = br.readLine()) != null)
-                System.out.println("line: " + s);
-            p.waitFor();
-            System.out.println("exit: " + p.exitValue());
-            p.destroy();
-        } catch (Exception e) {
-        }
-    }
 
     public User addPeerToConf (String username, String allowedIPs) {
         GenUserKeysScript genKeys = new GenUserKeysScript();
@@ -66,7 +48,9 @@ public class UserService {
 
         try {
             publicKey = readFile(Path.of(FILE_PATH + username + "_publickey")).toString();
+            publicKey = publicKey.substring(1, publicKey.length() - 1);
             privateKey = readFile(Path.of(FILE_PATH + username + "_privatekey")).toString();
+            privateKey = privateKey.substring(1, privateKey.length() - 1);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -124,6 +108,13 @@ public class UserService {
         }
     }
 
+    public void deleteKeysFiles(String username) {
+        File file1 = new File(FILE_PATH + username + "_publickey");
+        File file2 = new File(FILE_PATH + username + "_privatekey");
+        file1.delete();
+        file2.delete();
+    }
+
     public String preparationPeerBlock(String username, String publicKey, String allowedIPs) {
         StringBuilder sb = new StringBuilder();
         sb.append("#" + username + "\n")
@@ -146,7 +137,21 @@ public class UserService {
         }
     }
 
-
-
+    //чтение из консоли
+    public void wgShow() {
+        String s;
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec("systemctl status  wg-quick@wg0");
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(p.getInputStream()));
+            while ((s = br.readLine()) != null)
+                System.out.println("line: " + s);
+            p.waitFor();
+            System.out.println("exit: " + p.exitValue());
+            p.destroy();
+        } catch (Exception e) {
+        }
+    }
 
 }
