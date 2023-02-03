@@ -5,6 +5,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class UserRepository {
     private JdbcTemplate jdbcTemplate;
@@ -45,6 +47,11 @@ public class UserRepository {
 
         User user = new User(username, allowedIPs, privatekey, publickey);
         return user;
+    }
+
+    public SqlRowSet getAllUsers() {
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet("SELECT * FROM wgusers");
+        return sqlRowSet;
     }
 
 

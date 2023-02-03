@@ -20,9 +20,9 @@ public class CreateClientConfig {
             configDir.mkdir();
         }
 
-        Path userConfig = Paths.get(CONFIG_DIR + user.getUsername());
+        Path userConfig = Paths.get(CONFIG_DIR + user.getUsername() + ".conf");
 
-        String serverPublicKey = "NO";
+        String serverPublicKey = null;
 
         try {
             serverPublicKey = Files.readString(Path.of(FILE_PATH + "publickey"));

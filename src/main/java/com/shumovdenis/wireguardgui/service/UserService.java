@@ -3,6 +3,7 @@ package com.shumovdenis.wireguardgui.service;
 import com.shumovdenis.wireguardgui.entity.User;
 import com.shumovdenis.wireguardgui.repository.UserRepository;
 import com.shumovdenis.wireguardgui.utils.GenUserKeysScript;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,6 +24,22 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public List<User> getUsers(){
+        SqlRowSet result = userRepository.getAllUsers();
+        List<User> userList = new ArrayList<>();
+        while(result.next()) {
+            User user = new User(
+                    result.getInt("id"),
+                    result.getString("username"),
+                    result.getString("email"),
+                    result.getString("allowedIPs"),
+                    result.getString("lastHandShake")
+            );
+            userList.add(user);
+        }
+        return userList;
+    }
+
     public void addUser(String username, String allowedIPs) {
         User user = addPeerToConf(username, allowedIPs);
         userRepository.addUser(user);
@@ -32,8 +50,6 @@ public class UserService {
         deleteInfoFromConf(username);
         deleteKeysFiles(username);
     }
-
-
 
     public User addPeerToConf (String username, String allowedIPs) {
         GenUserKeysScript genKeys = new GenUserKeysScript();

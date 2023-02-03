@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Wg GUI</title>
+    <link rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <div>
+        <table border="1">
+            <tr th:each = "user: ${users}">
+                <td th:utext="${user.username}">...</td>
+                <td th:utext="${user.userEmail}">...</td>
+                <td th:utext="${user.allowedIPs}">...</td>
+                <td th:utext="${user.lastHandShake}">...</td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+
+</html>
