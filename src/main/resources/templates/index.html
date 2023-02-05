@@ -26,11 +26,15 @@
                     <td th:utext="${user.allowedIPs}">...</td>
                     <td th:utext="${user.lastHandShake}">...</td>
                     <td>
-                        <form th:action="@{'index/delete'(username=${user.username})}" th:method="delete">
+                        <form th:action="@{'index/download/{username}'(username=${user.username})}" th:method="get">
+                            <button type="submit">Download</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form th:action="@{'index/delete'(username=${user.username})}" th:method="post">
                             <button type="submit">Delete</button>
                         </form>
                     </td>
-
                 </tr>
             </table>
         </div>

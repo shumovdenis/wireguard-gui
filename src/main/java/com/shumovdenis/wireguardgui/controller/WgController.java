@@ -2,22 +2,25 @@ package com.shumovdenis.wireguardgui.controller;
 
 import com.shumovdenis.wireguardgui.repository.UserRepository;
 import com.shumovdenis.wireguardgui.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
-public class ThController {
+public class WgController {
 
     UserService userService;
+    UserRepository  userRepository;
 
-    @Value("${wg.address}")
-    private String serverIP;
-
-
-    public ThController(UserService userService) {
+    public WgController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
+
     }
 
     @GetMapping("/index")
@@ -42,6 +45,11 @@ public class ThController {
     public String deleteUser(@RequestParam("username") String username) {
         userService.deleteUser(username);
         return "redirect:/index";
+    }
+
+    @GetMapping("/index/download/{username}")
+    public void download(@PathVariable("username") String username, HttpServletResponse response)  {
+        userService.downloadFile(username, response);
     }
 
 

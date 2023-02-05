@@ -2,10 +2,14 @@ package com.shumovdenis.wireguardgui.service;
 
 import com.shumovdenis.wireguardgui.entity.User;
 import com.shumovdenis.wireguardgui.repository.UserRepository;
+import com.shumovdenis.wireguardgui.utils.CreateClientConfig;
 import com.shumovdenis.wireguardgui.utils.GenUserKeysScript;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,18 +20,51 @@ import java.util.List;
 
 @Service
 public class UserService {
-    private final String FILE_PATH = "/etc/wireguard/";
+    @Value("${wg.file.path}")
+    private String FILE_PATH;
 
+    @Value("${wg.config.path}")
+    private String WG_CONFIG_PATH;
+
+    @Value("${wg.server.ip}")
+    private String WG_SERVER_IP;
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public List<User> getUsers(){
+    public void downloadFile(String username, HttpServletResponse response) {
+        User user = userRepository.findUser(username);
+        CreateClientConfig ccc = new CreateClientConfig();
+        ccc.createUserConfig(user, WG_SERVER_IP);
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition",
+                "attachment;filename=" + username + ".conf");
+
+        File file = new File(WG_CONFIG_PATH + username + ".conf");
+
+        FileInputStream fileIn = null;
+        ServletOutputStream out = null;
+        try {
+            fileIn = new FileInputStream(file);
+            out = response.getOutputStream();
+            byte[] outputByte = new byte[(int) file.length()];
+            while (true) {
+                if (fileIn.read(outputByte, 0, (int) file.length()) == -1) break;
+                out.write(outputByte, 0, (int) file.length());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    public List<User> getUsers() {
         SqlRowSet result = userRepository.getAllUsers();
         List<User> userList = new ArrayList<>();
-        while(result.next()) {
+        while (result.next()) {
             User user = new User(
                     result.getInt("id"),
                     result.getString("username"),
@@ -51,7 +88,7 @@ public class UserService {
         deleteKeysFiles(username);
     }
 
-    public User addPeerToConf (String username, String allowedIPs) {
+    public User addPeerToConf(String username, String allowedIPs) {
         GenUserKeysScript genKeys = new GenUserKeysScript();
         try {
             genKeys.executeCommands(username);
@@ -132,12 +169,11 @@ public class UserService {
     }
 
     public String preparationPeerBlock(String username, String publicKey, String allowedIPs) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("#" + username + "\n")
-                .append("[Peer]\n")
-                .append("PublicKey = " + publicKey + "\n")
-                .append("AllowedIPs = " + allowedIPs + "\n\n");
-        return sb.toString();
+        String sb = "#" + username + "\n" +
+                "[Peer]\n" +
+                "PublicKey = " + publicKey + "\n" +
+                "AllowedIPs = " + allowedIPs + "\n\n";
+        return sb;
     }
 
     public List<String> readFile(Path path) throws IOException {
