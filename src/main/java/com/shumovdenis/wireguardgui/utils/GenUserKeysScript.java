@@ -19,7 +19,7 @@ public class GenUserKeysScript {
         }
     }
 
-    private File createTempScript(String name) throws IOException {
+    private File createTempScript(String username) throws IOException {
         File tempScript = File.createTempFile("script", null);
 
         Writer streamWriter = new OutputStreamWriter(new FileOutputStream(
@@ -27,7 +27,7 @@ public class GenUserKeysScript {
         PrintWriter printWriter = new PrintWriter(streamWriter);
 
         printWriter.println("#!/bin/bash");
-        printWriter.println("wg genkey | tee /etc/wireguard/" + name + "_privatekey | wg pubkey | tee /etc/wireguard/" + name + "_publickey");
+        printWriter.println("wg genkey | tee /etc/wireguard/" + username + "_privatekey | wg pubkey | tee /etc/wireguard/" + username + "_publickey");
         printWriter.close();
         return tempScript;
     }

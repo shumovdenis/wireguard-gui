@@ -34,33 +34,6 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void downloadFile(String username, HttpServletResponse response) {
-        User user = userRepository.findUser(username);
-        CreateClientConfig ccc = new CreateClientConfig();
-        ccc.createUserConfig(user, WG_SERVER_IP);
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition",
-                "attachment;filename=" + username + ".conf");
-
-        File file = new File(WG_CONFIG_PATH + username + ".conf");
-
-        FileInputStream fileIn = null;
-        ServletOutputStream out = null;
-        try {
-            fileIn = new FileInputStream(file);
-            out = response.getOutputStream();
-            byte[] outputByte = new byte[(int) file.length()];
-            while (true) {
-                if (fileIn.read(outputByte, 0, (int) file.length()) == -1) break;
-                out.write(outputByte, 0, (int) file.length());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
-    }
-
     public List<User> getUsers() {
         SqlRowSet result = userRepository.getAllUsers();
         List<User> userList = new ArrayList<>();
@@ -84,8 +57,33 @@ public class UserService {
 
     public void deleteUser(String username) {
         userRepository.deleteUser(username);
-        deleteInfoFromConf(username);
+        deletePeerFromConf(username);
         deleteKeysFiles(username);
+    }
+
+    public void downloadFile(String username, HttpServletResponse response) {
+        User user = userRepository.findUser(username);
+        CreateClientConfig ccc = new CreateClientConfig();
+        ccc.createUserConfig(user, WG_SERVER_IP);
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition",
+                "attachment;filename=" + username + ".conf");
+
+        File file = new File(WG_CONFIG_PATH + username + ".conf");
+
+        FileInputStream fileIn = null;
+        ServletOutputStream out = null;
+        try {
+            fileIn = new FileInputStream(file);
+            out = response.getOutputStream();
+            byte[] outputByte = new byte[(int) file.length()];
+            while (true) {
+                if (fileIn.read(outputByte, 0, (int) file.length()) == -1) break;
+                out.write(outputByte, 0, (int) file.length());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public User addPeerToConf(String username, String allowedIPs) {
@@ -108,14 +106,14 @@ public class UserService {
             throw new RuntimeException(e);
         }
         User user = new User(username, allowedIPs, privateKey, publicKey);
-        String peer = preparationPeerBlock(
+        String peer = peerTextBlock(
                 user.getUsername(), user.getPublicKey(), user.getAllowedIPs()
         );
         writeFile(peer, FILE_PATH + "wg0.conf");
         return user;
     }
 
-    public void deleteInfoFromConf(String username) {
+    public void deletePeerFromConf(String username) {
         try {
 
             File inFile = new File(FILE_PATH + "wg0.conf");
@@ -168,7 +166,7 @@ public class UserService {
         file2.delete();
     }
 
-    public String preparationPeerBlock(String username, String publicKey, String allowedIPs) {
+    public String peerTextBlock(String username, String publicKey, String allowedIPs) {
         String sb = "#" + username + "\n" +
                 "[Peer]\n" +
                 "PublicKey = " + publicKey + "\n" +
