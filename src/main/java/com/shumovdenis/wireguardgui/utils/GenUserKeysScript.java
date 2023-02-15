@@ -4,7 +4,7 @@ import java.io.*;
 
 public class GenUserKeysScript {
 
-    public void executeCommands(String name) throws IOException {
+    public void executeCommands(String name) {
         File tempScript = createTempScript(name);
 
         try {
@@ -12,18 +12,29 @@ public class GenUserKeysScript {
             pb.inheritIO();
             Process process = pb.start();
             process.waitFor();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         } finally {
             tempScript.delete();
         }
     }
 
-    private File createTempScript(String username) throws IOException {
-        File tempScript = File.createTempFile("script", null);
+    private File createTempScript(String username) {
 
-        Writer streamWriter = new OutputStreamWriter(new FileOutputStream(
-                tempScript));
+        File tempScript = null;
+        try {
+            tempScript = File.createTempFile("script", null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Writer streamWriter = null;
+        try {
+            streamWriter = new OutputStreamWriter(new FileOutputStream(
+                    tempScript));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         PrintWriter printWriter = new PrintWriter(streamWriter);
 
         printWriter.println("#!/bin/bash");

@@ -24,7 +24,7 @@ public class WgController {
     }
 
     @GetMapping("/index")
-    public String index(Model model) {
+    public String getPage(Model model) {
         model.addAttribute("users", userService.getUsers());
         return "index";
     }
@@ -48,7 +48,7 @@ public class WgController {
     }
 
     @GetMapping("/index/download/{username}")
-    public void download(@PathVariable("username") String username, HttpServletResponse response)  {
+    public void downloadConfig(@PathVariable("username") String username, HttpServletResponse response)  {
         userService.downloadFile(username, response);
     }
 

@@ -42,8 +42,8 @@ public class UserService {
                     result.getInt("id"),
                     result.getString("username"),
                     result.getString("email"),
-                    result.getString("allowedIPs"),
-                    result.getString("lastHandShake")
+                    result.getString("lastHandShake"),
+                    result.getString("allowedIPs")
             );
             userList.add(user);
         }
@@ -88,11 +88,7 @@ public class UserService {
 
     public User addPeerToConf(String username, String allowedIPs) {
         GenUserKeysScript genKeys = new GenUserKeysScript();
-        try {
-            genKeys.executeCommands(username);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        genKeys.executeCommands(username);
 
         String privateKey = null;
         String publicKey = null;
