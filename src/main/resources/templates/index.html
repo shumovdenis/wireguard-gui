@@ -20,6 +20,12 @@
         <div>
             <h4>Wg Users</h4>
             <table width="90%" border="1">
+                <tr>
+                    <td>User</td>
+                    <td>Email</td>
+                    <td>AllowedIPs</td>
+                    <td>LastHandshake</td>
+                </tr>
                 <tr th:each="user: ${users}">
                     <td height="15%" width="15" th:utext="${user.username}">...</td>
                     <td height="15%" width="15" th:utext="${user.userEmail}">...</td>

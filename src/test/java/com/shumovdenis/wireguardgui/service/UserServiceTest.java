@@ -19,7 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
-    UserService userService = new UserService(mockUserRepository);
+    FileService fileService = Mockito.mock(FileService.class);
+    UserService userService = new UserService(mockUserRepository, fileService);
 
     @Test
     void testGetUsers() {

@@ -3,7 +3,6 @@ package com.shumovdenis.wireguardgui.service;
 import com.shumovdenis.wireguardgui.entity.User;
 import com.shumovdenis.wireguardgui.repository.UserRepository;
 import com.shumovdenis.wireguardgui.utils.CreateClientConfig;
-import com.shumovdenis.wireguardgui.utils.GenUserKeysScript;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
@@ -11,11 +10,8 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -29,9 +25,11 @@ public class UserService {
     @Value("${wg.server.ip}")
     private String WG_SERVER_IP;
     private final UserRepository userRepository;
+    private final FileService fileService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, FileService fileService) {
         this.userRepository = userRepository;
+        this.fileService = fileService;
     }
 
     public List<User> getUsers() {
@@ -50,8 +48,11 @@ public class UserService {
         return userList;
     }
 
+
     public void addUser(String username, String allowedIPs) {
-        User user = addPeerToConf(username, allowedIPs);
+        HashMap<String, String> keys = fileService.createPublicAndPrivateKeys(username, allowedIPs);
+        User user = new User(username, allowedIPs, keys.get("privateKey"), keys.get("publicKey").toString());
+        fileService.addUserToConfigFile(user);
         userRepository.addUser(user);
     }
 
@@ -84,29 +85,6 @@ public class UserService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public User addPeerToConf(String username, String allowedIPs) {
-        GenUserKeysScript genKeys = new GenUserKeysScript();
-        genKeys.executeCommands(username);
-
-        String privateKey = null;
-        String publicKey = null;
-
-        try {
-            publicKey = readFile(Path.of(FILE_PATH + username + "_publickey")).toString();
-            publicKey = publicKey.substring(1, publicKey.length() - 1);
-            privateKey = readFile(Path.of(FILE_PATH + username + "_privatekey")).toString();
-            privateKey = privateKey.substring(1, privateKey.length() - 1);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        User user = new User(username, allowedIPs, privateKey, publicKey);
-        String peer = peerTextBlock(
-                user.getUsername(), user.getPublicKey(), user.getAllowedIPs()
-        );
-        writeFile(peer, FILE_PATH + "wg0.conf");
-        return user;
     }
 
     public void deletePeerFromConf(String username) {
@@ -162,26 +140,7 @@ public class UserService {
         file2.delete();
     }
 
-    public String peerTextBlock(String username, String publicKey, String allowedIPs) {
-        String sb = "#" + username + "\n" +
-                "[Peer]\n" +
-                "PublicKey = " + publicKey + "\n" +
-                "AllowedIPs = " + allowedIPs + "\n\n";
-        return sb;
-    }
 
-    public List<String> readFile(Path path) throws IOException {
-        List<String> list = Files.readAllLines(path);
-        return list;
-    }
-
-    public void writeFile(String peer, String filepath) {
-        try {
-            Files.write(Paths.get(filepath), peer.getBytes(), StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-    }
 
     //чтение из консоли
     public void wgShow() {
