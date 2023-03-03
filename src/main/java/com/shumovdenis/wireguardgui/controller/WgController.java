@@ -1,6 +1,7 @@
 package com.shumovdenis.wireguardgui.controller;
 
 import com.shumovdenis.wireguardgui.repository.UserRepository;
+import com.shumovdenis.wireguardgui.service.FileService;
 import com.shumovdenis.wireguardgui.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,13 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 public class WgController {
 
-    UserService userService;
-    UserRepository  userRepository;
+    private final UserService userService;
+    private final FileService fileService;
 
-    public WgController(UserService userService, UserRepository userRepository) {
+    public WgController(UserService userService, FileService fileService) {
         this.userService = userService;
-        this.userRepository = userRepository;
-
+        this.fileService = fileService;
     }
 
     @GetMapping("/index")
@@ -31,7 +31,7 @@ public class WgController {
 
     @PostMapping("/index")
     public String addUser(@RequestParam("name") String username,
-                        @RequestParam("allowedIPs") String allowedIPs,
+                          @RequestParam("allowedIPs") String allowedIPs,
                           Model model
     ) {
         model.addAttribute("name", username);
@@ -48,8 +48,8 @@ public class WgController {
     }
 
     @GetMapping("/index/download/{username}")
-    public void downloadConfig(@PathVariable("username") String username, HttpServletResponse response)  {
-        userService.downloadFile(username, response);
+    public void downloadConfig(@PathVariable("username") String username, HttpServletResponse response) {
+        fileService.downloadUserFileConfig(username, response);
     }
 
 
