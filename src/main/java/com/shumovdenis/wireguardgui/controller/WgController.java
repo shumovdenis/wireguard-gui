@@ -1,6 +1,5 @@
 package com.shumovdenis.wireguardgui.controller;
 
-import com.shumovdenis.wireguardgui.repository.UserRepository;
 import com.shumovdenis.wireguardgui.service.FileService;
 import com.shumovdenis.wireguardgui.service.UserService;
 import org.springframework.stereotype.Controller;
